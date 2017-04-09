@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Data Filter App</title>
+    <link rel="stylesheet" href="./css/index.css">
+    <script src="./js/index.js"></script>
+    <script type="text/javascript" src="./bower_components/jquery/dist/jquery.min.js" onload="window.$ = window.jQuery = module.exports;"></script>
+    <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-7">
+          <div class="input-group">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="button" id="select-dir">Select Dir</button>
+            </span>
+            <input type="text" class="form-control" placeholder="Directory..." id="curr-dir" readonly>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <button class="btn btn-default" type="button" id="initialize">Initialize</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="image-div col-md-8" style="height: 91vh;">
+          <img id="frame-img" src="" alt="Current Frame Image" style="width: 99%; height: 99%;">
+        </div>
+        <div class="control-div col-md-4">
+          <p>Current Frame: <span id="frame-counter"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Start Frame: <span id="frame-start">0</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;End Frame: <span id="frame-end">0</span></p>
+          <p>Steering Angle: <span id="steering-angle">0</span> degree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Speed: <span id="speed">0</span> km/h</p>
+          <button class="btn btn-default" id="next-btn">Next Frame</button>
+          <button class="btn btn-default" id="prev-btn">Prev Frame</button>
+          <br>
+          <hr/>
+          <input class="form-control" type="number" value="5" id="jump-frame" style="width: 100px;">
+          <p></p>
+          <button class="btn btn-default" id="jump-forward-btn">Jump Forward</button>
+          <button class="btn btn-default" id="jump-backward-btn">Jump Backward</button>
+          <br>
+          <hr/>
+          <input class="form-control" type="number" value="50" id="interval" style="width: 100px;">
+          <p></p>
+          <button class="btn btn-default" type="button" id="play">Play</button>
+          <button class="btn btn-default" type="button" id="rewind">Rewind</button>
+          <button class="btn btn-default" type="button" id="stop">Stop</button>
+          <br>
+          <hr/>
+          <div class="dropdown" style="float: left; width: 155px;">
+            <button class="btn btn-default dropdown-toggle" type="button" id="trash-types" data-toggle="dropdown">Trash Types
+            <span class="caret"></span></button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="trash-types" id="trash-types-list">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">1. Windshield wiper</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">2. Lane change</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">3. Non highway</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">4. Strong sun light</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">5. Strange Lanes</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">6. Distort light</a></li>
+            </ul>
+          </div>
+          <div style="float: left;">
+            <button class="btn btn-default" type="button" id="trash-start">Trash Start</button>
+            <button class="btn btn-default" type="button" id="trash-end">Trash End</button>
+            <button class="btn btn-default" type="button" id="trash-confirm">Confirm</button>
+            <button type="button" class="btn btn-primary" id="trash-export">Export</button>
+          </div>
+          <div style="height: 400px; width: 500px; overflow: auto; float: left;">
+            <table class="table" id="trash-table">
+              <thead>
+                <tr>
+                  <th>Trash Type</th>
+                  <th>Trash Start</th>
+                  <th>Trash End</th>
+                  <th>Remove</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    // You can also require other files to run in this process
+    require('./renderer.js')
+  </script>
+</html>
