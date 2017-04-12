@@ -18,6 +18,31 @@ var swAngleMap = new Map();
 var speedMap = new Map();
 
 $(function() {
+    // Add keyboard event listener.
+    document.addEventListener('keydown', (event) => {
+        const keyName = event.key;
+        if(event.ctrlKey) {
+            if(keyName === 'ArrowLeft' || keyName === 'ArrowDown' || keyName === 'a' || keyName === 's') {
+                displayPrevKFrames();
+            } else if(keyName === 'ArrowRight' || keyName === 'ArrowUp' || keyName === 'd' || keyName === 'w') {
+                displayNextKFrames();
+            } else if(keyName === ' ') {
+                rewind();
+            }
+        } else {
+            if(keyName === 'ArrowLeft' || keyName === 'ArrowDown' || keyName === 'a' || keyName === 's') {
+                displayPrevFrame();
+            } else if(keyName === 'ArrowRight' || keyName === 'ArrowUp' || keyName === 'd' || keyName === 'w') {
+                displayNextFrame();
+            } else if(keyName === ' ') {
+                if(timer !== null) {
+                    stop();
+                } else {
+                    playback();
+                }
+            }
+        }
+    }, false);
     $('#frame-counter').text(currFrameNum.toString());
     $('#next-btn').on('click', displayNextFrame);
     $('#prev-btn').on('click', displayPrevFrame);
@@ -29,6 +54,7 @@ $(function() {
     $('#rewind').on('click', rewind);
     $('#stop').on('click', stop);
     $('#trash-types-list li').click(function(evt) {
+        resetFocus();
         $('#trash-types').text($(evt.target).text());
         $('#trash-table tr:last > .trash-type').html($('#trash-types').text());
     });
@@ -46,6 +72,7 @@ function selectDirectory() {
         console.log(currDir);
         $('#curr-dir').val(currDir);
     });
+    resetFocus();
 }
 
 function initialize() {
@@ -84,6 +111,7 @@ function initialize() {
         updateSteeringAngle();
         updateSpeed();
     });
+    resetFocus();
 }
 // Starts playback from current frame.
 function playback() {
@@ -93,6 +121,7 @@ function playback() {
         return;
     }
     timer = setInterval(displayNextFrame, interval);
+    resetFocus();
 }
 function rewind() {
     interval = parseInt($('#interval').val());
@@ -101,10 +130,12 @@ function rewind() {
         return;
     }
     timer = setInterval(displayPrevFrame, interval);
+    resetFocus();
 }
 function stop() {
     clearInterval(timer);
     timer = null;
+    resetFocus();
 }
 
 function getFrameNum(fileName) {
@@ -129,6 +160,7 @@ function displayNextFrame() {
     $('#frame-img').attr('src', currFramePath);
     updateSteeringAngle();
     updateSpeed();
+    resetFocus();
 }
 
 function displayPrevFrame() {
@@ -141,6 +173,7 @@ function displayPrevFrame() {
     $('#frame-img').attr('src', currFramePath);
     updateSteeringAngle();
     updateSpeed();
+    resetFocus();
 }
 
 function displayNextKFrames() {
@@ -154,6 +187,7 @@ function displayNextKFrames() {
     $('#frame-img').attr('src', currFramePath);
     updateSteeringAngle();
     updateSpeed();
+    resetFocus();
 }
 
 function displayPrevKFrames() {
@@ -167,6 +201,14 @@ function displayPrevKFrames() {
     $('#frame-img').attr('src', currFramePath);
     updateSteeringAngle();
     updateSpeed();
+    resetFocus();
+}
+
+function resetFocus() {
+    window.focus();
+    if (document.activeElement) {
+        document.activeElement.blur();
+    }
 }
 
 function addNewTrashTableRow() {
@@ -182,14 +224,17 @@ function addNewTrashTableRow() {
     $('.trash-delete-btn').click(function(event) {
         $(this).parent().parent().remove();
     });
+    resetFocus();
 }
 
 function updateTrashStart() {
     $('#trash-table tbody tr:last > .trash-start').html(currFrameNum);
+    resetFocus();
 }
 
 function updateTrashEnd() {
     $('#trash-table tbody tr:last > .trash-end').html(currFrameNum);
+    resetFocus();
 }
 
 function exportTrashTable() {
@@ -214,6 +259,7 @@ function exportTrashTable() {
         }
         console.log('Finished...');
     });
+    resetFocus();
 }
 
 function updateSpeed() {
