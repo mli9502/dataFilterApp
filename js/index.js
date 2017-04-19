@@ -80,9 +80,12 @@ function initialize() {
     speedFile = currDir + '\\speedFile.txt';
     swFile = currDir + '\\swFile.txt';
     imageFiles = [];
+    swAngleMap = new Map();
+    speedMap = new Map();
     console.log(swFile);
     var swFileLines = fs.readFileSync(swFile, 'utf-8');
     swFileLines = swFileLines.split('\n');
+    console.log(swFileLines.length);
     loadSwAngle(swFileLines);
     console.log(swAngleMap);
     var speedFileLines = fs.readFileSync(speedFile, 'utf-8');
@@ -318,6 +321,7 @@ function loadSwAngle(fileLines) {
     }
     for(var key of swAngleMap.keys()) {
         var angles = swAngleMap.get(key);
+        // console.log(angles);
         swAngleMap.set(key, (angles[0] / angles[1]).toFixed(2));
     }
 }
