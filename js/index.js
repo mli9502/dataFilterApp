@@ -273,6 +273,10 @@ function exportTrashTable() {
             console.log(err);
         }
         console.log('Finished...');
+        dialog.showMessageBox({
+            type: 'info',
+            message: 'Successfully Exported'
+        });
     });
     resetFocus();
 }
