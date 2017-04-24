@@ -1,6 +1,7 @@
 var $ = require('jquery');
 var fs = require('fs');
-var dialog = require('electron').remote.dialog;
+var electron = require('electron');
+var dialog = electron.remote.dialog;
 
 var timer = null, interval = 50;
 
@@ -225,7 +226,18 @@ function addNewTrashTableRow() {
     $('#trash-table tbody').append(newRow);
     $('.trash-delete-btn').unbind();
     $('.trash-delete-btn').click(function(event) {
-        $(this).parent().parent().remove();
+        var currObj = $(this);
+        dialog.showMessageBox({
+            type: 'warning',
+            message: 'Do you want to remove this entry?',
+            buttons: ['Yes', 'No']
+        }, function(response) {
+            console.log(response);
+            if(response == 0) {
+                currObj.parent().parent().remove();
+            }
+            resetFocus();
+        });
     });
     resetFocus();
 }
