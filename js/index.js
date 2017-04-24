@@ -2,6 +2,7 @@ var $ = require('jquery');
 var fs = require('fs');
 var electron = require('electron');
 var dialog = electron.remote.dialog;
+var validate = require('./js/validate');
 
 var timer = null, interval = 50;
 
@@ -51,6 +52,7 @@ $(function() {
     $('#jump-backward-btn').on('click', displayPrevKFrames);
     $('#select-dir').on('click', selectDirectory);
     $('#initialize').on('click', initialize);
+    $('#validate').on('click', validate.validate);
     $('#play').on('click', playback);
     $('#rewind').on('click', rewind);
     $('#stop').on('click', stop);
@@ -77,6 +79,9 @@ function selectDirectory() {
 }
 
 function initialize() {
+    // Show label buttons, hide validation buttons.
+    $('#label-div').show();
+    $('#validate-div').hide();
     currImgFolder = currDir + '\\cam1';
     speedFile = currDir + '\\speedFile.txt';
     swFile = currDir + '\\swFile.txt';

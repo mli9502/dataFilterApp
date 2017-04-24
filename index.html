@@ -22,13 +22,14 @@
         </div>
         <div class="col-md-4">
           <button class="btn btn-default" type="button" id="initialize">Initialize</button>
+          <button class="btn btn-default" type="button" id="validate">Validate</button>
         </div>
       </div>
       <div class="row">
         <div class="image-div col-md-8" style="height: 91vh;">
           <img id="frame-img" src="" alt="Current Frame Image" style="width: 99%; height: 99%;">
         </div>
-        <div class="control-div col-md-4">
+        <div class="control-div col-md-4" id="label-div">
           <p>Current Frame: <span id="frame-counter"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Start Frame: <span id="frame-start">0</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;End Frame: <span id="frame-end">0</span></p>
           <p>Steering Angle: <span id="steering-angle">0</span> degree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Speed: <span id="speed">0</span> km/h</p>
           <button class="btn btn-default" id="next-btn">Next Frame</button>
@@ -80,6 +81,9 @@
               </tbody>
             </table>
           </div>
+        </div>
+        <div class="control-div col-md-4" id="validate-div" style="display: none;">
+          Hello World!
         </div>
       </div>
     </div>
