@@ -63,25 +63,74 @@ exports.trash_displayPrevFrame = function() {
 
 exports.trash_playback = function() {
     validate_interval = parseInt($('#trash-interval').val());
-    stop();
+    _this.validate_stop();
     if(validate_timer !== null) {
         return;
     }
     validate_timer = setInterval(_this.trash_displayNextFrame, validate_interval);
     resetFocus();
 }
-exports.trash_stop = function() {
+exports.validate_stop = function() {
     clearInterval(validate_timer);
     validate_timer = null;
     resetFocus();
 }
 exports.trash_rewind = function() {
     validate_interval = parseInt($('#trash-interval').val());
-    stop();
+    _this.validate_stop();
     if(validate_timer !== null) {
         return;
     }
     validate_timer = setInterval(_this.trash_displayPrevFrame, validate_interval);
+    resetFocus();
+}
+
+exports.valid_displayNextFrame = function() {
+    currFrameNum ++;
+    if(currFrameNum > endFrameNum) {
+        currFrameNum = startFrameNum;
+    }
+    currFrameNum = getNextValidFrame();
+    console.log(currFrameNum);
+    currFramePath = currImgFolder.concat('\\', imageFiles[currFrameNum - startFrameNum]);
+    $('#validate-frame-counter').text(currFrameNum.toString());
+    $('#frame-img').attr('src', currFramePath);
+    updateSteeringAngle(true);
+    updateSpeed(true);
+    resetFocus();
+};
+
+exports.valid_displayPrevFrame = function() {
+    currFrameNum --;
+    if(currFrameNum < startFrameNum) {
+        currFrameNum = endFrameNum;
+    }
+    currFrameNum = getPrevValidFrame();
+    console.log(currFrameNum);
+    currFramePath = currImgFolder.concat('\\', imageFiles[currFrameNum - startFrameNum]);
+    $('#validate-frame-counter').text(currFrameNum.toString());
+    $('#frame-img').attr('src', currFramePath);
+    updateSteeringAngle(true);
+    updateSpeed(true);
+    resetFocus();
+}
+
+exports.valid_playback = function() {
+    validate_interval = parseInt($('#valid-interval').val());
+    _this.validate_stop();
+    if(validate_timer !== null) {
+        return;
+    }
+    validate_timer = setInterval(_this.valid_displayNextFrame, validate_interval);
+    resetFocus();
+}
+exports.valid_rewind = function() {
+    validate_interval = parseInt($('#valid-interval').val());
+    _this.validate_stop();
+    if(validate_timer !== null) {
+        return;
+    }
+    validate_timer = setInterval(_this.valid_displayPrevFrame, validate_interval);
     resetFocus();
 }
 
@@ -130,7 +179,7 @@ function getNextDiscardFrame() {
 }
 
 function getPrevDiscardFrame() {
-    if(validList.length == 0) {
+    if(discardFrameList.length == 0) {
         alert('Valid list should not be empty.');
         if(currFrameNum + 1 > endFrameNum) {
             return [endFrameNum, -1];
@@ -149,10 +198,62 @@ function getPrevDiscardFrame() {
             if(currFrameNum < startFrameNum) {
                 currFrameNum = endFrameNum;
             }
-            return getNextDiscardFrame(currFrameNum);
+            return getPrevDiscardFrame(currFrameNum);
         }
     }
     return [-1, -1];
+}
+
+function getNextValidFrame() {
+    if(validList.length == 0) {
+        alert('Valid list should not be empty.');
+        if(currFrameNum - 1 < startFrameNum) {
+            return startFrameNum;
+        }
+        return currFrameNum - 1;
+    }
+    for(var i = 0; i < validList.length; i ++) {
+        var range = validList[i];
+        if(currFrameNum >= range[0] && currFrameNum <= range[1]) {
+            return currFrameNum;
+        }
+    }
+    for(var i = 0; i < discardFrameList.length; i ++) {
+        if(currFrameNum >= discardFrameList[i][0] && currFrameNum <= discardFrameList[i][1]) {
+            currFrameNum = discardFrameList[i][1] + 1;
+            if(currFrameNum > endFrameNum) {
+                currFrameNum = startFrameNum;
+            }
+            return getNextValidFrame(currFrameNum);
+        }
+    }
+    return -1;
+}
+
+function getPrevValidFrame() {
+    if(validList.length == 0) {
+        alert('Valid list should not be empty.');
+        if(currFrameNum - 1 < startFrameNum) {
+            return startFrameNum;
+        }
+        return currFrameNum - 1;
+    }
+    for(var i = 0; i < validList.length; i ++) {
+        var range = validList[i];
+        if(currFrameNum >= range[0] && currFrameNum <= range[1]) {
+            return currFrameNum;
+        }
+    }
+    for(var i = 0; i < discardFrameList.length; i ++) {
+        if(currFrameNum >= discardFrameList[i][0] && currFrameNum <= discardFrameList[i][1]) {
+            currFrameNum = discardFrameList[i][0] - 1;
+            if(currFrameNum < startFrameNum) {
+                currFrameNum = endFrameNum;
+            }
+            return getPrevValidFrame(currFrameNum);
+        }
+    }
+    return -1;
 }
 
 function updateTrashReason(discardKey) {

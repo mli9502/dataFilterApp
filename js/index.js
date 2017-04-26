@@ -28,6 +28,10 @@ var speedMap = new Map();
 $(function() {
     // Add keyboard event listener.
     document.addEventListener('keydown', (event) => {
+        if(matFile.length != 0) {
+            console.log('in event listener');
+            return;
+        }
         const keyName = event.key;
         if(event.ctrlKey) {
             if(keyName === 'ArrowLeft' || keyName === 'ArrowDown' || keyName === 'a' || keyName === 's') {
@@ -53,9 +57,11 @@ $(function() {
     }, false);
     $('#frame-counter').text(currFrameNum.toString());
     $('#next-btn').on('click', displayNextFrame);
+    $('#prev-btn').on('click', displayPrevFrame);
     $('#trash-next-btn').on('click', validate.trash_displayNextFrame);
     $('#trash-prev-btn').on('click', validate.trash_displayPrevFrame);
-    $('#prev-btn').on('click', displayPrevFrame);
+    $('#valid-next-btn').on('click', validate.valid_displayNextFrame);
+    $('#valid-prev-btn').on('click', validate.valid_displayPrevFrame);
     $('#jump-forward-btn').on('click', displayNextKFrames);
     $('#jump-backward-btn').on('click', displayPrevKFrames);
     $('#select-dir').on('click', selectDirectory);
@@ -65,8 +71,11 @@ $(function() {
     $('#rewind').on('click', rewind);
     $('#stop').on('click', stop);
     $('#trash-play').on('click', validate.trash_playback);
-    $('#trash-stop').on('click', validate.trash_stop);
+    $('#trash-stop').on('click', validate.validate_stop);
     $('#trash-rewind').on('click', validate.trash_rewind);
+    $('#valid-play').on('click', validate.valid_playback);
+    $('#valid-stop').on('click', validate.validate_stop);
+    $('#valid-rewind').on('click', validate.valid_rewind);
     $('#trash-types-list li').click(function(evt) {
         resetFocus();
         $('#trash-types').text($(evt.target).text());
