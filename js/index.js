@@ -9,12 +9,18 @@ var timer = null, interval = 50;
 var currFrameNum = 0;
 var currDir = '';
 var currImgFolder = '';
+var leftImgFolder = '';
+var rightImgFolder = '';
 var speedFile = '';
 var swFile = '';
+var matFile = '';
 var imageFiles = [];
+var leftImageFiles = [];
+var rightImageFiles = [];
 var startFrameNum = 0;
 var endFrameNum = 0;
 var currRowCnt = 0;
+var discardFrameList = [];
 
 var swAngleMap = new Map();
 var speedMap = new Map();
@@ -47,6 +53,7 @@ $(function() {
     }, false);
     $('#frame-counter').text(currFrameNum.toString());
     $('#next-btn').on('click', displayNextFrame);
+    $('#trash-next-btn').on('click', validate.trash_displayNextFrame);
     $('#prev-btn').on('click', displayPrevFrame);
     $('#jump-forward-btn').on('click', displayNextKFrames);
     $('#jump-backward-btn').on('click', displayPrevKFrames);
@@ -77,17 +84,30 @@ function selectDirectory() {
     });
     resetFocus();
 }
-
-function initialize() {
-    // Show label buttons, hide validation buttons.
-    $('#label-div').show();
-    $('#validate-div').hide();
+// TODO: Add support for left and right images.
+function loadFiles(loadMatFile) {
+    var tokens = currDir.split('\\');
+    var currDirName = tokens[tokens.length - 1];
     currImgFolder = currDir + '\\cam1';
+    leftImgFolder = currDir + '\\cam0';
+    rightImgFolder = currDir + '\\cam2';
     speedFile = currDir + '\\speedFile.txt';
     swFile = currDir + '\\swFile.txt';
+    if(loadMatFile) {
+        matFile = currDir + '\\' + currDirName + '_discard_frames.m';
+    }
     imageFiles = [];
+    discardFrameList = [];
     swAngleMap = new Map();
     speedMap = new Map();
+    // Load matlab file here.
+    if(loadMatFile) {
+        console.log(matFile);
+        var matFileLines = fs.readFileSync(matFile, 'utf-8');
+        matFileLines = matFileLines.split('\n');
+        loadDiscardFrames(matFileLines);
+        console.log(discardFrameList);
+    }
     console.log(swFile);
     var swFileLines = fs.readFileSync(swFile, 'utf-8');
     swFileLines = swFileLines.split('\n');
@@ -98,28 +118,47 @@ function initialize() {
     speedFileLines = speedFileLines.split('\n');
     loadSpeed(speedFileLines);
     console.log(speedMap);
-    fs.readdir(currImgFolder, (err, files) => {
-        files.forEach(file => {
-            if(file.includes('jpg')) {
-                imageFiles.push(file);
-            }
-        });
-        imageFiles.sort(compare);
-        // Display the first image and current frame number.
-        currFrameNum = getFrameNum(imageFiles[0]);
-        startFrameNum = currFrameNum;
-        endFrameNum = currFrameNum + imageFiles.length - 1;
-        currFramePath = currImgFolder.concat('\\', imageFiles[0]);
-        $('#frame-counter').text(currFrameNum.toString());
-        $('#frame-start').text(startFrameNum.toString());
-        $('#frame-end').text(endFrameNum.toString());
-        $('#frame-img').attr('src', currFramePath);
-        $('#trash-types').text('Trash Types');
-        $('#trash-table > tbody').html("");
-        addNewTrashTableRow();
-        updateSteeringAngle();
-        updateSpeed();
+    var files = fs.readdirSync(currImgFolder);
+    files.forEach(file => {
+        if(file.includes('jpg')) {
+            imageFiles.push(file);
+        }
     });
+    imageFiles.sort(compare);
+    currFrameNum = getFrameNum(imageFiles[0]);
+    startFrameNum = currFrameNum;
+    endFrameNum = currFrameNum + imageFiles.length - 1;
+    currFramePath = currImgFolder.concat('\\', imageFiles[0]);
+    $('#frame-img').attr('src', currFramePath);
+}
+
+function loadDiscardFrames(matFileLines) {
+    console.log(matFileLines);
+    for(var i = 0; i < matFileLines.length; i ++) {
+        var line = matFileLines[i];
+        if(i == 0 || i >= matFileLines.length - 2) {
+            continue;
+        }
+        console.log(line);
+        var tokens = line.split(',');
+        console.log(tokens);
+        discardFrameList.push([parseInt(tokens[0]), parseInt(tokens[1]), parseInt(tokens[2].substring(0, tokens[2].length - 1))]);        
+    }
+}
+
+function initialize() {
+    // Show label buttons, hide validation buttons.
+    $('#label-div').show();
+    $('#validate-div').hide();
+    loadFiles(false);
+    $('#frame-counter').text(currFrameNum.toString());
+    $('#frame-start').text(startFrameNum.toString());
+    $('#frame-end').text(endFrameNum.toString());
+    $('#trash-types').text('Trash Types');
+    $('#trash-table > tbody').html("");
+    addNewTrashTableRow();
+    updateSteeringAngle(false);
+    updateSpeed(false);
     resetFocus();
 }
 // Starts playback from current frame.
@@ -260,7 +299,7 @@ function updateTrashEnd() {
 function exportTrashTable() {
     var tokens = currDir.split('\\');
     var currDirName = tokens[tokens.length - 1];
-    var content = 'trash_' + currDirName + '=[';
+    var content = 'trash_' + currDirName + '=[\n';
     $('#trash-table tbody tr').each(function(i, tr) {
         var type = $('.trash-type', tr).text();
         var tokens = type.split('.');
@@ -286,12 +325,16 @@ function exportTrashTable() {
     resetFocus();
 }
 
-function updateSpeed() {
+function updateSpeed(loadMatFile) {
     var speed = speedMap.get(currFrameNum);
-    if(speed === undefined) {
-        $('#speed').text('No data');
+    var id = '#speed';
+    if(loadMatFile) {
+        id = '#validate-speed';
     }
-    $('#speed').text(speed);
+    if(speed === undefined) {
+        $(id).text('No data');
+    }
+    $(id).text(speed);
 }
 
 function loadSpeed(fileLines) {
@@ -305,12 +348,16 @@ function loadSpeed(fileLines) {
     }
 }
 
-function updateSteeringAngle() {
+function updateSteeringAngle(loadMatFile) {
     var angle = swAngleMap.get(currFrameNum);
-    if(angle === undefined) {
-        $('#steering-angle').text('No data');
+    var id = '#steering-angle';
+    if(loadMatFile) {
+        id = '#validate-steering-angle';
     }
-    $('#steering-angle').text(angle);
+    if(angle === undefined) {
+        $(id).text('No data');
+    }
+    $(id).text(angle);
 }
 
 function loadSwAngle(fileLines) {

@@ -83,7 +83,33 @@
           </div>
         </div>
         <div class="control-div col-md-4" id="validate-div" style="display: none;">
-          Hello World!
+          <p>Current Frame: <span id="validate-frame-counter"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Start Frame: <span id="validate-frame-start">0</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;End Frame: <span id="validate-frame-end">0</span></p>
+          <p>Steering Angle: <span id="validate-steering-angle">0</span> degree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Speed: <span id="validate-speed">0</span> km/h</p>
+          <hr/>
+          <p><b>Play Trash Data</b></p>
+          <button class="btn btn-default" id="trash-next-btn">Next Frame</button>
+          <button class="btn btn-default" id="trash-prev-btn">Prev Frame</button>
+          <br>
+          <hr align="left" width="50%">
+          <input class="form-control" type="number" value="50" id="trash-interval" style="width: 100px;">
+          <p></p>
+          <button class="btn btn-default" type="button" id="trash-play">Play</button>
+          <button class="btn btn-default" type="button" id="trash-rewind">Rewind</button>
+          <button class="btn btn-default" type="button" id="trash-stop">Stop</button>
+          <br>
+          <hr align="left" width="50%">
+          <p>Trash Reason: <span id="trash-reason"></span></p>
+          <hr/>
+          <p><b>Play Valid Data</b></p>
+          <button class="btn btn-default" id="valid-next-btn">Next Frame</button>
+          <button class="btn btn-default" id="valid-prev-btn">Prev Frame</button>
+          <br>
+          <hr align="left" width="50%">
+          <input class="form-control" type="number" value="50" id="valid-interval" style="width: 100px;">
+          <p></p>
+          <button class="btn btn-default" type="button" id="valid-play">Play</button>
+          <button class="btn btn-default" type="button" id="valid-rewind">Rewind</button>
+          <button class="btn btn-default" type="button" id="valid-stop">Stop</button>
         </div>
       </div>
     </div>
