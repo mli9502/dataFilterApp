@@ -54,6 +54,7 @@ $(function() {
     $('#frame-counter').text(currFrameNum.toString());
     $('#next-btn').on('click', displayNextFrame);
     $('#trash-next-btn').on('click', validate.trash_displayNextFrame);
+    $('#trash-prev-btn').on('click', validate.trash_displayPrevFrame);
     $('#prev-btn').on('click', displayPrevFrame);
     $('#jump-forward-btn').on('click', displayNextKFrames);
     $('#jump-backward-btn').on('click', displayPrevKFrames);
@@ -63,6 +64,9 @@ $(function() {
     $('#play').on('click', playback);
     $('#rewind').on('click', rewind);
     $('#stop').on('click', stop);
+    $('#trash-play').on('click', validate.trash_playback);
+    $('#trash-stop').on('click', validate.trash_stop);
+    $('#trash-rewind').on('click', validate.trash_rewind);
     $('#trash-types-list li').click(function(evt) {
         resetFocus();
         $('#trash-types').text($(evt.target).text());
@@ -95,6 +99,8 @@ function loadFiles(loadMatFile) {
     swFile = currDir + '\\swFile.txt';
     if(loadMatFile) {
         matFile = currDir + '\\' + currDirName + '_discard_frames.m';
+    } else {
+        matFile = '';
     }
     imageFiles = [];
     discardFrameList = [];

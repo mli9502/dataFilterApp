@@ -3,7 +3,14 @@ var fs = require('fs');
 var electron = require('electron');
 var dialog = electron.remote.dialog;
 var validList = [];
-
+var validate_timer = null, validate_interval = 50;
+var discardMap = {1:'Windshield wiper', 
+                    2:'Lane Change', 
+                    3: 'Non highway',
+                    4: 'Strong sun light',
+                    5: 'Strange Lanes',
+                    6: 'Distort Light'};
+var _this = this;
 exports.validate = function() {
     // TODO: Report error if .mat file is not present or discardFrameList is empty.
     $('#label-div').hide();
@@ -23,15 +30,61 @@ exports.trash_displayNextFrame = function() {
     if(currFrameNum > endFrameNum) {
         currFrameNum = startFrameNum;
     }
-    currFrameNum = getNextDiscardFrame();
+    var tmpArr = getNextDiscardFrame();
+    currFrameNum = tmpArr[0];
+    discardKey = tmpArr[1];
     console.log(currFrameNum);
     currFramePath = currImgFolder.concat('\\', imageFiles[currFrameNum - startFrameNum]);
     $('#validate-frame-counter').text(currFrameNum.toString());
     $('#frame-img').attr('src', currFramePath);
     updateSteeringAngle(true);
     updateSpeed(true);
+    updateTrashReason(discardKey);
     resetFocus();
 };
+exports.trash_displayPrevFrame = function() {
+    currFrameNum --;
+    if(currFrameNum < startFrameNum) {
+        currFrameNum = endFrameNum;
+    }
+    var tmpArr = getPrevDiscardFrame();
+    currFrameNum = tmpArr[0];
+    discardKey = tmpArr[1];
+    console.log(currFrameNum);
+    console.log(discardKey);
+    currFramePath = currImgFolder.concat('\\', imageFiles[currFrameNum - startFrameNum]);
+    $('#validate-frame-counter').text(currFrameNum.toString());
+    $('#frame-img').attr('src', currFramePath);
+    updateSteeringAngle(true);
+    updateSpeed(true);
+    updateTrashReason(discardKey);
+    resetFocus();
+}
+
+exports.trash_playback = function() {
+    validate_interval = parseInt($('#trash-interval').val());
+    stop();
+    if(validate_timer !== null) {
+        return;
+    }
+    validate_timer = setInterval(_this.trash_displayNextFrame, validate_interval);
+    resetFocus();
+}
+exports.trash_stop = function() {
+    clearInterval(validate_timer);
+    validate_timer = null;
+    resetFocus();
+}
+exports.trash_rewind = function() {
+    validate_interval = parseInt($('#trash-interval').val());
+    stop();
+    if(validate_timer !== null) {
+        return;
+    }
+    validate_timer = setInterval(_this.trash_displayPrevFrame, validate_interval);
+    resetFocus();
+}
+
 function getValidList() {
     var discardArr = [];
     for(var i = 0; i < discardFrameList.length; i ++) {
@@ -51,18 +104,17 @@ function getValidList() {
 }
 // Get the next discard frame based on current frame.
 function getNextDiscardFrame() {
-    // TODO: report error if trash list is empty.
     if(discardFrameList.length == 0) {
-        alert("Trash list should not be empty.");
+        alert('Trash list should not be empty.');
         if(currFrameNum - 1 < startFrameNum) {
-            return startFrameNum;
+            return [startFrameNum, -1];
         }
-        return currFrameNum - 1;
+        return [currFrameNum - 1, -1];
     }
     for(var i = 0; i < discardFrameList.length; i ++) {
         var range = discardFrameList[i];
         if(currFrameNum >= range[0] && currFrameNum <= range[1]) {
-            return currFrameNum;
+            return [currFrameNum, range[2]];
         }
     }
     for(var i = 0; i < validList.length; i ++) {
@@ -74,5 +126,40 @@ function getNextDiscardFrame() {
             return getNextDiscardFrame(currFrameNum);
         }
     }
-    return -1;
+    return [-1, -1];
+}
+
+function getPrevDiscardFrame() {
+    if(validList.length == 0) {
+        alert('Valid list should not be empty.');
+        if(currFrameNum + 1 > endFrameNum) {
+            return [endFrameNum, -1];
+        }
+        return [currFrameNum + 1, -1];
+    }
+    for(var i = 0; i < discardFrameList.length; i ++) {
+        var range = discardFrameList[i];
+        if(currFrameNum >= range[0] && currFrameNum <= range[1]) {
+            return [currFrameNum, range[2]];
+        }
+    }
+    for(var i = 0; i < validList.length; i ++) {
+        if(currFrameNum >= validList[i][0] && currFrameNum <= validList[i][1]) {
+            currFrameNum = validList[i][0] - 1;
+            if(currFrameNum < startFrameNum) {
+                currFrameNum = endFrameNum;
+            }
+            return getNextDiscardFrame(currFrameNum);
+        }
+    }
+    return [-1, -1];
+}
+
+function updateTrashReason(discardKey) {
+    var discardReason = 'Empty';
+    if(discardKey != -1) {
+        discardReason = discardMap[discardKey];
+    }
+    console.log(discardReason);
+    $('#trash-reason').text(discardKey + ' - ' + discardReason);
 }
