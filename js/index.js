@@ -102,8 +102,8 @@ function loadFiles(loadMatFile) {
     var tokens = currDir.split('\\');
     var currDirName = tokens[tokens.length - 1];
     currImgFolder = currDir + '\\cam1';
-    leftImgFolder = currDir + '\\cam0';
-    rightImgFolder = currDir + '\\cam2';
+    leftImgFolder = currDir + '\\cam2';
+    rightImgFolder = currDir + '\\cam0';
     speedFile = currDir + '\\speedFile.txt';
     swFile = currDir + '\\swFile.txt';
     if(loadMatFile) {
@@ -133,18 +133,28 @@ function loadFiles(loadMatFile) {
     speedFileLines = speedFileLines.split('\n');
     loadSpeed(speedFileLines);
     console.log(speedMap);
-    var files = fs.readdirSync(currImgFolder);
-    files.forEach(file => {
-        if(file.includes('jpg')) {
-            imageFiles.push(file);
-        }
-    });
-    imageFiles.sort(compare);
+    loadImgFiles(currImgFolder, imageFiles);
+    loadImgFiles(leftImgFolder, leftImageFiles);
+    loadImgFiles(rightImgFolder, rightImageFiles);
     currFrameNum = getFrameNum(imageFiles[0]);
     startFrameNum = currFrameNum;
     endFrameNum = currFrameNum + imageFiles.length - 1;
     currFramePath = currImgFolder.concat('\\', imageFiles[0]);
+    leftFramePath = leftImgFolder.concat('\\', leftImageFiles[0]);
+    rightFramePath = rightImgFolder.concat('\\', rightImageFiles[0]);
     $('#frame-img').attr('src', currFramePath);
+    $('#left-frame-img').attr('src', leftFramePath);
+    $('#right-frame-img').attr('src', rightFramePath);
+}
+
+function loadImgFiles(folder, arr) {
+    var files = fs.readdirSync(folder);
+    files.forEach(file => {
+        if(file.includes('jpg')) {
+            arr.push(file);
+        }
+    });
+    arr.sort(compare);
 }
 
 function loadDiscardFrames(matFileLines) {
@@ -219,8 +229,12 @@ function displayNextFrame() {
         currFrameNum = startFrameNum;
     }
     currFramePath = currImgFolder.concat('\\', imageFiles[currFrameNum - startFrameNum]);
+    leftFramePath = leftImgFolder.concat('\\', leftImageFiles[currFrameNum - startFrameNum]);
+    rightFramePath = rightImgFolder.concat('\\', rightImageFiles[currFrameNum - startFrameNum]);
     $('#frame-counter').text(currFrameNum.toString());
     $('#frame-img').attr('src', currFramePath);
+    $('#left-frame-img').attr('src', leftFramePath);
+    $('#right-frame-img').attr('src', rightFramePath);
     updateSteeringAngle();
     updateSpeed();
     resetFocus();
@@ -232,8 +246,12 @@ function displayPrevFrame() {
         currFrameNum = endFrameNum;
     }
     currFramePath = currImgFolder.concat('\\', imageFiles[currFrameNum - startFrameNum]);
+    leftFramePath = leftImgFolder.concat('\\', leftImageFiles[currFrameNum - startFrameNum]);
+    rightFramePath = rightImgFolder.concat('\\', rightImageFiles[currFrameNum - startFrameNum]);
     $('#frame-counter').text(currFrameNum.toString());
     $('#frame-img').attr('src', currFramePath);
+    $('#left-frame-img').attr('src', leftFramePath);
+    $('#right-frame-img').attr('src', rightFramePath);
     updateSteeringAngle();
     updateSpeed();
     resetFocus();
@@ -246,8 +264,12 @@ function displayNextKFrames() {
         currFrameNum -= endFrameNum;
     }
     currFramePath = currImgFolder.concat('\\', imageFiles[currFrameNum - startFrameNum]);
+    leftFramePath = leftImgFolder.concat('\\', leftImageFiles[currFrameNum - startFrameNum]);
+    rightFramePath = rightImgFolder.concat('\\', rightImageFiles[currFrameNum - startFrameNum]);
     $('#frame-counter').text(currFrameNum.toString());
     $('#frame-img').attr('src', currFramePath);
+    $('#left-frame-img').attr('src', leftFramePath);
+    $('#right-frame-img').attr('src', rightFramePath);
     updateSteeringAngle();
     updateSpeed();
     resetFocus();
@@ -260,8 +282,12 @@ function displayPrevKFrames() {
         currFrameNum += endFrameNum;
     }
     currFramePath = currImgFolder.concat('\\', imageFiles[currFrameNum - startFrameNum]);
+    leftFramePath = leftImgFolder.concat('\\', leftImageFiles[currFrameNum - startFrameNum]);
+    rightFramePath = rightImgFolder.concat('\\', rightImageFiles[currFrameNum - startFrameNum]);
     $('#frame-counter').text(currFrameNum.toString());
     $('#frame-img').attr('src', currFramePath);
+    $('#left-frame-img').attr('src', leftFramePath);
+    $('#right-frame-img').attr('src', rightFramePath);
     updateSteeringAngle();
     updateSpeed();
     resetFocus();
